@@ -1641,8 +1641,8 @@ MonoBehaviour:
   Highlight: {fileID: 114000010925541644}
   SelectableColliders: []
   DefaultSelectableIndex: 0
-  AllowSelectionWrapX: 1
-  AllowSelectionWrapY: 1
+  AllowSelectionWrapX: 0
+  AllowSelectionWrapY: 0
   ForceSelectionHighlight: 0
   ForceInteractionHighlight: 0
 --- !u!114 &114000010508114576
@@ -1883,7 +1883,12 @@ MonoBehaviour:
   m_Script: {fileID: -289456416, guid: 45b809be76fd7a3468b6f517bced6f28, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Settings: '{"ColorBlindMode": true}'
+  Settings: " { \t\"ColorBlindMode\":\t \tfalse, \t\"DebugModePattern\": \t-1, \t\"DebugModeColor\":\t\t-1,
+    \t\"How To Use\":\t\t\t\"Colorblind mode can be enabled by setting ColorBlindMode
+    to true.  \tChanging the Debug Mode color and/or pattern to valid column or row
+    numbers will make every module have \tthe color/pattern specified by that number.
+    For example, setting DebugModePattern to 1 will make every \tmodule have a blue
+    light.\"  }"
 --- !u!114 &114000012688440476
 MonoBehaviour:
   m_ObjectHideFlags: 1

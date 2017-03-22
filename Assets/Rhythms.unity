@@ -37,7 +37,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 0}
-  m_IndirectSpecularColor: {r: 0.44692492, g: 0.4967869, b: 0.57508546, a: 1}
+  m_IndirectSpecularColor: {r: 0.44692534, g: 0.49678725, b: 0.5750856, a: 1}
 --- !u!157 &3
 LightmapSettings:
   m_ObjectHideFlags: 0
@@ -265,7 +265,7 @@ Camera:
     y: 0
     width: 1
     height: 1
-  near clip plane: 0.3
+  near clip plane: 0.01
   far clip plane: 1000
   field of view: 36
   orthographic: 0
@@ -290,7 +290,7 @@ Transform:
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 1817574459}
   m_LocalRotation: {x: 0.7071068, y: 0, z: 0, w: 0.7071068}
-  m_LocalPosition: {x: -0, y: 0.339, z: -0}
+  m_LocalPosition: {x: -0, y: 0.4, z: -0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_LocalEulerAnglesHint: {x: 90, y: 0, z: 0}
   m_Children: []
@@ -334,16 +334,6 @@ Prefab:
     - target: {fileID: 4000013625029754, guid: 18f3758a57029d5419364125560a7859, type: 2}
       propertyPath: m_RootOrder
       value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 114000012664207198, guid: 18f3758a57029d5419364125560a7859,
-        type: 2}
-      propertyPath: Settings
-      value: " { \t\"ColorBlindMode\":\t \tfalse, \t\"DebugModePattern\": \t-1, \t\"DebugModeColor\":\t\t-1,
-        \t\"How To Use\":\t\t\t\"Colorblind mode can be enabled by setting ColorBlindMode
-        to true.  \tChanging the Debug Mode color and/or pattern to valid column or
-        row numbers will make every module have \tthe color/pattern specified by that
-        number. For example, setting DebugModePattern to 1 will make every \tmodule
-        have a blue light.\"  }"
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: 18f3758a57029d5419364125560a7859, type: 2}
