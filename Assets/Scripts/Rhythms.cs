@@ -108,7 +108,9 @@ public class Rhythms
 
 	int selectedButton = 0;
 
-	bool buttonIsHeld = false;
+	bool buttonIsPhysicallyHeld = false;
+
+	bool buttonIsMetaphoricallyHeld = false;
 
 	KMAudio.KMAudioRef audioRefBeep;
 
@@ -139,18 +141,11 @@ public class Rhythms
 
 		thisModuleNumber = moduleNumber++;
 
-
 		loadSettings ();
 		if (!colorBlindMode) {Destroy (colorblindText);};
 		SetColorblindText ("");
 
-
 		GetComponent<KMBombModule>().OnActivate += OnActivate;
-		GetComponent<KMSelectable>().OnCancel += OnCancel;
-		//GetComponent<KMSelectable> ().OnInteract += OnInteract;
-		GetComponent<KMSelectable> ().OnInteractEnded += OnInteractEnded;
-
-
 
 
 		for (int i = buttons.Length - 1; i > 0; i--) {//Shuffle the buttons array, stolen from the unity forums
@@ -181,21 +176,6 @@ public class Rhythms
 		}*/
 
 	}
-
-	private bool OnInteract () {
-
-		//Debug.Log ("Rythms Interact Began");
-		//blinkLight.range = 2;
-
-		return true;//I am guessing here! I don't actually know what this return value is supposed to do, but it seems to work like this (and not when returning false).
-	}
-
-	private void OnInteractEnded() {
-		//Debug.Log ("Rythms Interact Ended");
-		//blinkLight.range = 0;
-	}
-
-
 
 	void OnActivate()
 	{
@@ -309,25 +289,15 @@ public class Rhythms
 
 	}
 
-
-	bool OnCancel()
-	{
-		//Debug.Log("ExampleModule2 cancel.");
-
-		return true;
-	}
-
 	void OnPress(int button)
 	{
+		buttonIsPhysicallyHeld = true;
+		selectedButton = button;
+		StartCoroutine (MoveButton (true, button));
 
-		if (active) {//No pressing buttons when the bomb isn't active
-			
-			StartCoroutine (MoveButton (true, button));
+		if (active) {//Buttons that are pressed before bomb is active don't do anything
 			GetComponent<KMAudio> ().PlayGameSoundAtTransform (KMSoundOverride.SoundEffect.BigButtonPress, transform);
-			buttonIsHeld = true;
-			selectedButton = button;
-			//LogMessage ("Button label " + labels [button] + " has been pressed");
-
+			buttonIsMetaphoricallyHeld = true;
 			if (correctAction == -2) {
 				if (timesPressed == 0) {
 					lastTimePressed = Time.time;
@@ -360,10 +330,14 @@ public class Rhythms
 	void OnRelease()
 	{
 		stopBeep ();
-		if (buttonIsHeld) {//No releasing buttons when they aren't held
+		if (buttonIsPhysicallyHeld) {
 			StartCoroutine(MoveButton(false, selectedButton));
 			GetComponent<KMAudio>().PlayGameSoundAtTransform(KMSoundOverride.SoundEffect.BigButtonRelease, transform);
-			buttonIsHeld = false;
+			buttonIsPhysicallyHeld = false;
+		}
+		if (buttonIsMetaphoricallyHeld) {//No releasing buttons when they aren't held
+
+			buttonIsMetaphoricallyHeld = false;
 			string message = "Button labeled " + labels [selectedButton] + " pressed and released";
 			if (correctAction == -2) {//For RAPID BUTTON PRESSES
 				timesPressed++;
@@ -411,13 +385,13 @@ public class Rhythms
 		currentPressId++;
 		int thisPressId = currentPressId;
 		yield return new WaitForSeconds (0.4f);
-		while (thisPressId == currentPressId & buttonIsHeld) {
+		while (thisPressId == currentPressId & buttonIsMetaphoricallyHeld) {
 			//If thisPressId != currentPressId, then another instance of this method is active.
 			beepsPlayed++;
 			//LogMessage ("Beep: " + beepsPlayed + " PressID: " + thisPressId);
 			stopBeep ();
 			audioRefBeep = GetComponent<KMAudio>().PlaySoundAtTransformWithRef("HoldChirp", transform);
-			yield return new WaitForSeconds (1.2f);
+			yield return new WaitForSeconds (1.1f); //This value fine-tuned with the help of Rexkix
 
 		}
 	}
@@ -444,7 +418,7 @@ public class Rhythms
 	IEnumerator Strike() {
 		lightsBlinking = false;
 		active = false;
-		buttonIsHeld = false;
+		//buttonIsMetaphoricallyHeld = false;
 		lightOff ();
 		SetColorblindText ("");
 		GetComponent<KMBombModule> ().HandleStrike ();
