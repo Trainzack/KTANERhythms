@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Collections;
 using Newtonsoft.Json;
+using System.Text.RegularExpressions;
 
 public class Rhythms
 	: MonoBehaviour
@@ -34,7 +35,11 @@ public class Rhythms
 
 	float lightIntensity = 0.5f;
 
-	float flashLength = 0.12f;
+    float flashLength = 0.12f;
+
+    float beepLength = 1.1f; //This value fine-tuned with the help of Rexkix
+
+    float preBeepPause = 0.4f;
 
 	float buttonMashTime = 0.7f;
 
@@ -119,7 +124,7 @@ public class Rhythms
 	#region Used for *** action
 	int timesPressed = 0;
 
-	int timesNeeded;
+	int timesNeeded = 0;
 
 	float lastTimePressed;
 
@@ -384,14 +389,14 @@ public class Rhythms
 		beepsPlayed = 0;
 		currentPressId++;
 		int thisPressId = currentPressId;
-		yield return new WaitForSeconds (0.4f);
+		yield return new WaitForSeconds (preBeepPause);
 		while (thisPressId == currentPressId & buttonIsMetaphoricallyHeld) {
 			//If thisPressId != currentPressId, then another instance of this method is active.
 			beepsPlayed++;
 			//LogMessage ("Beep: " + beepsPlayed + " PressID: " + thisPressId);
 			stopBeep ();
 			audioRefBeep = GetComponent<KMAudio>().PlaySoundAtTransformWithRef("HoldChirp", transform);
-			yield return new WaitForSeconds (1.1f); //This value fine-tuned with the help of Rexkix
+            yield return new WaitForSeconds(beepLength);
 
 		}
 	}
@@ -421,9 +426,9 @@ public class Rhythms
 		//buttonIsMetaphoricallyHeld = false;
 		lightOff ();
 		SetColorblindText ("");
-		GetComponent<KMBombModule> ().HandleStrike ();
+        LogMessage("Giving strike #" + (GetComponent<KMBombInfo>().GetStrikes() + 1));
+        GetComponent<KMBombModule> ().HandleStrike ();
 		stopBeep ();
-		LogMessage ("Gave strike #" + GetComponent<KMBombInfo> ().GetStrikes());
 		yield return new WaitForSecondsRealtime (1.5f);
 		active = true;
 		SetPattern ();
@@ -500,6 +505,76 @@ public class Rhythms
 		}
 				
 	}
+
+    //Twitch plays integration
+    public IEnumerator ProcessTwitchCommand(string command)
+    {
+        Match modulesMatch = Regex.Match(command, "(press|hold)? (♩|♪|♫|♬) (for )?([0-9])*", RegexOptions.IgnoreCase);
+        int buttonGroup = 2;
+        int durationGroup = 4;
+        if (!modulesMatch.Success)
+        {
+            if (command.Equals("mash", System.StringComparison.InvariantCultureIgnoreCase))
+            {
+                LogMessage("Mashing buttons!");
+                for (int i = 0; i < 4; i++)
+                {
+                    yield return buttons[2];
+                    yield return new WaitForSeconds(0.04f);
+                }
+                
+                yield return new WaitForSeconds(0.04f);
+                while (timesPressed < timesNeeded)
+                {
+                    KMSelectable button = buttons[Random.Range(0,4)];
+                    yield return button;
+                    yield return new WaitForSeconds(0.04f);
+                    yield return button;
+                    yield return new WaitForSeconds(0.04f);
+
+                }
+                yield break;
+            }
+            LogMessage("Invalid Twitch command \"" + command + "\".");
+            yield break;
+        }
+
+        int selectedButtonIndex = -1;
+
+        string buttonName = modulesMatch.Groups[buttonGroup].Value;
+        for (int i = 0; i < 4; i++)
+        {
+            if (labels[i].Equals(buttonName, System.StringComparison.InvariantCultureIgnoreCase))
+            {
+                selectedButtonIndex = i;
+            }
+        }
+
+        if (selectedButtonIndex == -1)
+        {
+            LogMessage("Invalid Twitch command \"" + command + "\" (invalid button '"+ modulesMatch.Groups[buttonGroup].Value+"').");
+            yield break;
+        }
+
+
+        KMSelectable selectedButton = buttons[selectedButtonIndex];
+
+        int count = 0;
+
+        if (!(modulesMatch.Groups[durationGroup].Value == ""))
+        {
+            count = int.Parse(modulesMatch.Groups[durationGroup].Value);
+        }
+
+        float duration = (count * beepLength) + (preBeepPause / 2);
+
+        LogMessage("Valid Twitch command \"" + command + "\". Holding for a duration of " + duration + " seconds.");
+
+        yield return selectedButton;
+        yield return new WaitForSeconds(duration);
+        yield return selectedButton;
+
+    }
 
 }
 
