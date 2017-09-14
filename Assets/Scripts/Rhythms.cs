@@ -119,6 +119,7 @@ public class Rhythms
 
 	KMAudio.KMAudioRef audioRefBeep;
 
+    KMSelectable[] twitchPlaysButtons;
 	#endregion
 
 	#region Used for *** action
@@ -152,6 +153,10 @@ public class Rhythms
 
 		GetComponent<KMBombModule>().OnActivate += OnActivate;
 
+	    twitchPlaysButtons = new[]
+	    {
+	        buttons[0], buttons[1], buttons[2], buttons[3]
+	    };  //Used for Twitchplays TL/TR/BL/BR notation.
 
 		for (int i = buttons.Length - 1; i > 0; i--) {//Shuffle the buttons array, stolen from the unity forums
 			int r = Random.Range (0, i);
@@ -509,9 +514,9 @@ public class Rhythms
     //Twitch plays integration
     public IEnumerator ProcessTwitchCommand(string command)
     {
-        Match modulesMatch = Regex.Match(command, "(press|hold)? (♩|♪|♫|♬) (for )?([0-9])*", RegexOptions.IgnoreCase);
-        int buttonGroup = 2;
-        int durationGroup = 4;
+        Match modulesMatch = Regex.Match(command, "((press|hold) )?(♩|♪|♫|♬|tl|tr|bl|br|lt|rt|lb|rb|[1-4])( (for )?([0-9]+))?", RegexOptions.IgnoreCase);
+        int buttonGroup = 3;
+        int durationGroup = 6;
         if (!modulesMatch.Success)
         {
             if (command.Equals("mash", System.StringComparison.InvariantCultureIgnoreCase))
@@ -539,25 +544,38 @@ public class Rhythms
             yield break;
         }
 
-        int selectedButtonIndex = -1;
-
+        KMSelectable selectedButton = null;
         string buttonName = modulesMatch.Groups[buttonGroup].Value;
-        for (int i = 0; i < 4; i++)
+        switch (buttonName)
         {
-            if (labels[i].Equals(buttonName, System.StringComparison.InvariantCultureIgnoreCase))
-            {
-                selectedButtonIndex = i;
-            }
+            case "tl": case "lt": case "1":
+                selectedButton = twitchPlaysButtons[0];
+                break;
+            case "tr": case "rt": case "2":
+                selectedButton = twitchPlaysButtons[1];
+                break;
+            case "bl": case "lb": case "3":
+                selectedButton = twitchPlaysButtons[2];
+                break;
+            case "br": case "rb": case "4":
+                selectedButton = twitchPlaysButtons[3];
+                break;
+            default:
+                for (int i = 0; i < 4; i++)
+                {
+                    if (labels[i].Equals(buttonName, System.StringComparison.InvariantCultureIgnoreCase))
+                    {
+                        selectedButton = buttons[i];
+                    }
+                }
+                break;
         }
 
-        if (selectedButtonIndex == -1)
+        if (selectedButton == null)
         {
             LogMessage("Invalid Twitch command \"" + command + "\" (invalid button '"+ modulesMatch.Groups[buttonGroup].Value+"').");
             yield break;
         }
-
-
-        KMSelectable selectedButton = buttons[selectedButtonIndex];
 
         int count = 0;
 
