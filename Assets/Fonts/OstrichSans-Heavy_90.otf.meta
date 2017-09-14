@@ -3,13 +3,14 @@ guid: 1ebe1d96973a920409b439b3a0e2bb63
 timeCreated: 1464546457
 licenseType: Pro
 TrueTypeFontImporter:
-  serializedVersion: 3
+  serializedVersion: 4
   fontSize: 16
   forceTextureCase: -2
-  characterSpacing: 1
-  characterPadding: 0
+  characterSpacing: 0
+  characterPadding: 1
   includeFontData: 1
-  fontNames: []
+  fontNames:
+  - Ostrich Sans
   fallbackFontReferences: []
   customCharacters: 
   fontRenderingMode: 0
