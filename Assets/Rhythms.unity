@@ -37,7 +37,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 0}
-  m_IndirectSpecularColor: {r: 0.44692534, g: 0.49678725, b: 0.5750856, a: 1}
+  m_IndirectSpecularColor: {r: 0.44692558, g: 0.49678743, b: 0.57508624, a: 1}
 --- !u!157 &3
 LightmapSettings:
   m_ObjectHideFlags: 0
@@ -335,6 +335,50 @@ Prefab:
       propertyPath: m_RootOrder
       value: 1
       objectReference: {fileID: 0}
+    - target: {fileID: 102000010099568524, guid: 18f3758a57029d5419364125560a7859,
+        type: 2}
+      propertyPath: m_Font
+      value: 
+      objectReference: {fileID: 12800000, guid: 1ebe1d96973a920409b439b3a0e2bb63,
+        type: 3}
+    - target: {fileID: 23000012445388824, guid: 18f3758a57029d5419364125560a7859,
+        type: 2}
+      propertyPath: m_Materials.Array.data[0]
+      value: 
+      objectReference: {fileID: 2100000, guid: 1ebe1d96973a920409b439b3a0e2bb63, type: 3}
+    - target: {fileID: 102000011800612744, guid: 18f3758a57029d5419364125560a7859,
+        type: 2}
+      propertyPath: m_Font
+      value: 
+      objectReference: {fileID: 12800000, guid: 1ebe1d96973a920409b439b3a0e2bb63,
+        type: 3}
+    - target: {fileID: 23000011076929142, guid: 18f3758a57029d5419364125560a7859,
+        type: 2}
+      propertyPath: m_Materials.Array.data[0]
+      value: 
+      objectReference: {fileID: 2100000, guid: 1ebe1d96973a920409b439b3a0e2bb63, type: 3}
+    - target: {fileID: 102000010470853570, guid: 18f3758a57029d5419364125560a7859,
+        type: 2}
+      propertyPath: m_Font
+      value: 
+      objectReference: {fileID: 12800000, guid: 1ebe1d96973a920409b439b3a0e2bb63,
+        type: 3}
+    - target: {fileID: 23000012480493976, guid: 18f3758a57029d5419364125560a7859,
+        type: 2}
+      propertyPath: m_Materials.Array.data[0]
+      value: 
+      objectReference: {fileID: 2100000, guid: 1ebe1d96973a920409b439b3a0e2bb63, type: 3}
+    - target: {fileID: 102000011727714158, guid: 18f3758a57029d5419364125560a7859,
+        type: 2}
+      propertyPath: m_Font
+      value: 
+      objectReference: {fileID: 12800000, guid: 1ebe1d96973a920409b439b3a0e2bb63,
+        type: 3}
+    - target: {fileID: 23000010222060408, guid: 18f3758a57029d5419364125560a7859,
+        type: 2}
+      propertyPath: m_Materials.Array.data[0]
+      value: 
+      objectReference: {fileID: 2100000, guid: 1ebe1d96973a920409b439b3a0e2bb63, type: 3}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: 18f3758a57029d5419364125560a7859, type: 2}
   m_IsPrefabParent: 0
