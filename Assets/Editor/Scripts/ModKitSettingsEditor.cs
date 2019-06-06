@@ -15,68 +15,74 @@ public class ModKitSettingsEditor : Editor
         var modConfig = ModConfig.Instance;
         if (modConfig == null)
         {
-            modConfig = ScriptableObject.CreateInstance<ModConfig>();
-            string properPath = Path.Combine(Path.Combine(Application.dataPath, "Editor"), "Resources");
-            if (!Directory.Exists(properPath))
-            {
-                AssetDatabase.CreateFolder("Assets/Editor", "Resources");
-            }
-
-            string fullPath = Path.Combine(
-                Path.Combine("Assets", "Editor"),
-                Path.Combine("Resources", "ModConfig.asset")
-            );
-            AssetDatabase.CreateAsset(modConfig, fullPath);
-            ModConfig.Instance = modConfig;
+            CreateModConfig(out modConfig);
         }
         UnityEditor.Selection.activeObject = modConfig;
     }
 
-    public override void OnInspectorGUI()
+    public static void CreateModConfig(out ModConfig modConfig)
     {
-        EditorGUILayout.Separator();
-        EditorGUILayout.BeginHorizontal();
-        
-        GUIContent idLabel = new GUIContent("Mod ID", "Identifier for the mod. Affects assembly name and output name.");
-        GUI.changed = false;
-        ModConfig.ID = EditorGUILayout.TextField(idLabel, ModConfig.ID);
-        SetDirtyOnGUIChange();
-        EditorGUILayout.EndHorizontal();
+        modConfig = ScriptableObject.CreateInstance<ModConfig>();
+        string properPath = Path.Combine(Path.Combine(Application.dataPath, "Editor"), "Resources");
+        if (!Directory.Exists(properPath))
+        {
+            AssetDatabase.CreateFolder("Assets/Editor", "Resources");
+        }
 
-        EditorGUILayout.Separator();
-        EditorGUILayout.BeginHorizontal();
-        GUIContent titleLabel = new GUIContent("Mod Title", "Name of the mod as it appears in game.");
-        GUI.changed = false;
-        ModConfig.Title = EditorGUILayout.TextField(titleLabel, ModConfig.Title);
-        SetDirtyOnGUIChange();
-        EditorGUILayout.EndHorizontal();
-
-        EditorGUILayout.Separator();
-        EditorGUILayout.BeginHorizontal();
-        GUIContent versionLabel = new GUIContent("Mod Version", "Current version of the mod.");
-        GUI.changed = false;
-        ModConfig.Version = EditorGUILayout.TextField(versionLabel, ModConfig.Version);
-        SetDirtyOnGUIChange();
-        EditorGUILayout.EndHorizontal();
-
-        EditorGUILayout.Separator();
-        EditorGUILayout.BeginHorizontal();
-        GUIContent outputFolderLabel = new GUIContent("Mod Output Folder", "Folder relative to the project where the built mod bundle will be placed.");
-        GUI.changed = false;
-        ModConfig.OutputFolder = EditorGUILayout.TextField(outputFolderLabel, ModConfig.OutputFolder);
-        SetDirtyOnGUIChange();
-        EditorGUILayout.EndHorizontal();
-        EditorGUILayout.HelpBox("This folder will be cleaned with each build.", MessageType.Warning);
-
-        GUI.enabled = true;
+        string fullPath = Path.Combine(
+            Path.Combine("Assets", "Editor"),
+            Path.Combine("Resources", "ModConfig.asset")
+        );
+        AssetDatabase.CreateAsset(modConfig, fullPath);
+        ModConfig.Instance = modConfig;
     }
 
-    private void SetDirtyOnGUIChange()
+    public override void OnInspectorGUI()
     {
-        if (GUI.changed)
+        //Basic Info
+        EditorGUILayout.BeginVertical(EditorStyles.helpBox);
+
+        var idProperty = serializedObject.FindProperty("id");
+        EditorGUILayout.PropertyField(idProperty);
+        idProperty.stringValue = idProperty.stringValue.Trim();
+
+        var titleProperty = serializedObject.FindProperty("title");
+        EditorGUILayout.PropertyField(titleProperty);
+        titleProperty.stringValue = titleProperty.stringValue.Trim();
+
+        var authorProperty = serializedObject.FindProperty("author");
+        EditorGUILayout.PropertyField(authorProperty, new GUIContent("Author", "Only shown in local mods, mods from Steam will show Steam user as author"));
+        authorProperty.stringValue = authorProperty.stringValue.Trim();
+
+        EditorGUILayout.PropertyField(serializedObject.FindProperty("description"));
+        EditorGUILayout.PropertyField(serializedObject.FindProperty("version"));
+        EditorGUILayout.PropertyField(serializedObject.FindProperty("outputFolder"));
+
+        EditorGUILayout.EndVertical();
+
+        //Preview Image
+        EditorGUILayout.BeginHorizontal(EditorStyles.helpBox);
+        using (new EditorGUILayout.VerticalScope())
         {
-            EditorUtility.SetDirty(ModConfig.Instance);
-            GUI.changed = false;
+            EditorGUILayout.LabelField("Preview Image:");
+            EditorGUILayout.PropertyField(serializedObject.FindProperty("previewImage"), new GUIContent());
+
+            if (ModConfig.PreviewImage != null)
+            {
+                FileInfo f = new FileInfo(AssetDatabase.GetAssetPath(ModConfig.PreviewImage));
+                if (f.Exists)
+                {
+                    EditorGUILayout.LabelField(string.Format("File Size: {0}", WorkshopEditorWindow.FormatFileSize(f.Length)));
+
+                    if (f.Length > 1024 * 1024)
+                    {
+                        EditorGUILayout.HelpBox("Max allowed size is 1MB", MessageType.Error);
+                    }
+                }
+            }
         }
+        GUILayout.Label(ModConfig.PreviewImage, GUILayout.MaxWidth(128), GUILayout.MaxHeight(128));
+        EditorGUILayout.EndHorizontal();
+        serializedObject.ApplyModifiedProperties();
     }
 }
