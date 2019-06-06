@@ -21,11 +21,19 @@ public class KMMissionEditor : Editor
 
             //Basic mission meta-data
             EditorGUILayout.BeginHorizontal();
-            EditorGUILayout.PrefixLabel("ID:");
+            EditorGUILayout.PrefixLabel("ID");
             EditorGUILayout.SelectableLabel(serializedObject.targetObject.name);
             EditorGUILayout.EndHorizontal();
 
-            EditorGUILayout.PropertyField(serializedObject.FindProperty("DisplayName"));
+            EditorGUILayout.BeginHorizontal();
+            EditorGUILayout.PrefixLabel("ID In-Game");
+            EditorGUILayout.SelectableLabel(string.Format("mod_{0}_{1}", ModConfig.ID, serializedObject.targetObject.name));
+            EditorGUILayout.EndHorizontal();
+
+            var displayNameProperty = serializedObject.FindProperty("DisplayName");
+            EditorGUILayout.PropertyField(displayNameProperty);
+            displayNameProperty.stringValue = displayNameProperty.stringValue.Trim();
+
             EditorGUILayout.PropertyField(serializedObject.FindProperty("Description"));
             EditorGUILayout.PropertyField(serializedObject.FindProperty("PacingEventsEnabled"));
 
@@ -36,6 +44,7 @@ public class KMMissionEditor : Editor
             EditorGUILayout.PropertyField(serializedObject.FindProperty("GeneratorSetting.NumStrikes"));
             EditorGUILayout.PropertyField(serializedObject.FindProperty("GeneratorSetting.TimeBeforeNeedyActivation"));
             EditorGUILayout.PropertyField(serializedObject.FindProperty("GeneratorSetting.FrontFaceOnly"));
+            EditorGUILayout.PropertyField(serializedObject.FindProperty("GeneratorSetting.OptionalWidgetCount"));
 
             //Component Pools
             EditorGUILayout.Separator();
@@ -141,10 +150,8 @@ public class KMMissionEditor : Editor
         EditorGUILayout.BeginHorizontal();
 
         //Count
-        componentPoolProperty.FindPropertyRelative("Count").intValue = EditorGUILayout.IntPopup(
-            componentPoolProperty.FindPropertyRelative("Count").intValue,
-            new string[] { "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11" },
-            new int[] { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11 }, GUILayout.Width(60));
+        componentPoolProperty.FindPropertyRelative("Count").intValue = Math.Max(EditorGUILayout.IntField(
+            componentPoolProperty.FindPropertyRelative("Count").intValue, GUILayout.Width(60)), 1);
 
 
         //Summary of types in this pool
@@ -401,8 +408,13 @@ public class KMMissionEditor : Editor
         KMComponentPool componentPool = mission.GeneratorSetting.ComponentPools[poolIndex];
         SerializedProperty componentPools = serializedObject.FindProperty("GeneratorSetting.ComponentPools");
 
-        var element = componentPools.GetArrayElementAtIndex(poolIndex);
-        EditorGUILayout.PropertyField(element.FindPropertyRelative("ModTypes"), true);
+        var modTypesElement = componentPools.GetArrayElementAtIndex(poolIndex).FindPropertyRelative("ModTypes");
+        EditorGUILayout.PropertyField(modTypesElement, true);
+
+        // Trim whitespace from mod types
+        for (int i = 0; i < modTypesElement.arraySize; i++) {
+            modTypesElement.GetArrayElementAtIndex(i).stringValue = modTypesElement.GetArrayElementAtIndex(i).stringValue.Trim();
+        }
 
         //Clear any special flags if needed
         if (componentPool.ModTypes != null && componentPool.ModTypes.Count > 0)
